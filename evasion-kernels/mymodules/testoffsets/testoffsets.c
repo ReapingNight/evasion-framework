@@ -58,29 +58,29 @@ void *dev_check(struct device *dev)
   quasi_print((uint32_t)&dev_local->type,INIT_TOKEN+13);
   quasi_print((uint32_t)&dev_local->mutex,INIT_TOKEN+14);
   // { Members of  'struct mutex mutex'
-      quasi_print((uint32_t)&dev_local->mutex.count,INIT_TOKEN+15);
+      quasi_print((uint32_t)&dev_local->mutex.owner,INIT_TOKEN+15);
       quasi_print((uint32_t)&dev_local->mutex.wait_lock,INIT_TOKEN+16);
       // { Members of 'struct spintlock_t wait_lock'
-          quasi_print((uint32_t)&dev_local->mutex.wait_lock.rlock,INIT_TOKEN+17);
+          quasi_print((uint32_t)&dev_local->mutex.wait_lock,INIT_TOKEN+17);
           // { Members of 'struct raw_spinlock rlock'
-              quasi_print((uint32_t)&dev_local->mutex.wait_lock.rlock.raw_lock,TOKEN_RLOCK1+1);
+              quasi_print((uint32_t)&dev_local->mutex.wait_lock.raw_lock,TOKEN_RLOCK1+1);
               #ifdef CONFIG_GENERIC_LOCKBREAK
-              quasi_print((uint32_t)&dev_local->mutex.wait_lock.rlock.break_lock,TOKEN_RLOCK1+2);
+              quasi_print((uint32_t)&dev_local->mutex.wait_lock.break_lock,TOKEN_RLOCK1+2);
 	      #endif
               #ifdef CONFIG_DEBUG_SPINLOCK
-              quasi_print((uint32_t)&dev_local->mutex.wait_lock.rlock.magic,TOKEN_RLOCK1+3);
-              quasi_print((uint32_t)&dev_local->mutex.wait_lock.rlock.owner_cpu,TOKEN_RLOCK1+4);
-              quasi_print((uint32_t)&dev_local->mutex.wait_lock.rlock.owner,TOKEN_RLOCK1+5);
+              quasi_print((uint32_t)&dev_local->mutex.wait_lock.magic,TOKEN_RLOCK1+3);
+              quasi_print((uint32_t)&dev_local->mutex.wait_lock.owner_cpu,TOKEN_RLOCK1+4);
+              quasi_print((uint32_t)&dev_local->mutex.wait_lock.owner,TOKEN_RLOCK1+5);
 	      #endif
               #ifdef CONFIG_DEBUG_LOCK_ALLOC
-              quasi_print((uint32_t)&dev_local->mutex.wait_lock.rlock.dep_map,TOKEN_RLOCK1+6);
+              quasi_print((uint32_t)&dev_local->mutex.wait_lock.dep_map,TOKEN_RLOCK1+6);
 	      // { Members of 'struct lockdep_map dep_map'
-                  quasi_print((uint32_t)&dev_local->mutex.wait_lock.rlock.dep_map.key,TOKEN_RLOCK1+7);
-                  quasi_print((uint32_t)&dev_local->mutex.wait_lock.rlock.dep_map.class_cache,TOKEN_RLOCK1+8);
-                  quasi_print((uint32_t)&dev_local->mutex.wait_lock.rlock.dep_map.name,TOKEN_RLOCK1+9);
+                  quasi_print((uint32_t)&dev_local->mutex.wait_lock.dep_map.key,TOKEN_RLOCK1+7);
+                  quasi_print((uint32_t)&dev_local->mutex.wait_lock.dep_map.class_cache,TOKEN_RLOCK1+8);
+                  quasi_print((uint32_t)&dev_local->mutex.wait_lock.dep_map.name,TOKEN_RLOCK1+9);
                   #ifdef CONFIG_LOCK_STAT
-                  quasi_print((uint32_t)&dev_local->mutex.wait_lock.rlock.dep_map.cpu,TOKEN_RLOCK1+10);
-                  quasi_print((uint32_t)&dev_local->mutex.wait_lock.rlock.dep_map.ip,TOKEN_RLOCK1+11);
+                  quasi_print((uint32_t)&dev_local->mutex.wait_lock.dep_map.cpu,TOKEN_RLOCK1+10);
+                  quasi_print((uint32_t)&dev_local->mutex.wait_lock.dep_map.ip,TOKEN_RLOCK1+11);
 	          #endif
 	      // } Back to 'struct raw_spinlock rlock'
 	      #endif
@@ -234,11 +234,12 @@ void *dev_check(struct device *dev)
       #ifdef CONFIG_PM
       quasi_print((uint32_t)&dev_local->power.suspend_timer,INIT_TOKEN+69);
       // { Members of 'struct timer_list suspend_timer'
-          quasi_print((uint32_t)&dev_local->power.suspend_timer.entry,INIT_TOKEN+70);
-          quasi_print((uint32_t)&dev_local->power.suspend_timer.expires,INIT_TOKEN+71);
+        // TODO: Replace timer functionality with updated version
+        //   quasi_print((uint32_t)&dev_local->power.suspend_timer.entry,INIT_TOKEN+70);
+          quasi_print((uint32_t)&dev_local->power.suspend_timer._softexpires,INIT_TOKEN+71);
           quasi_print((uint32_t)&dev_local->power.suspend_timer.function,INIT_TOKEN+72);
-          quasi_print((uint32_t)&dev_local->power.suspend_timer.data,INIT_TOKEN+73);
-          quasi_print((uint32_t)&dev_local->power.suspend_timer.flags,INIT_TOKEN+74);
+        //   quasi_print((uint32_t)&dev_local->power.suspend_timer.data,INIT_TOKEN+73);
+        //   quasi_print((uint32_t)&dev_local->power.suspend_timer.flags,INIT_TOKEN+74);
           #ifdef CONFIG_TIMER_STATS
               quasi_print((uint32_t)&dev_local->power.suspend_timer.start_pid,INIT_TOKEN+75);
               quasi_print((uint32_t)&dev_local->power.suspend_timer.start_site,INIT_TOKEN+76);
@@ -260,20 +261,20 @@ void *dev_check(struct device *dev)
   // } Back to 'struct device'
   quasi_print((uint32_t)&dev_local->pm_domain,INIT_TOKEN+83);
   #ifdef CONFIG_GENERIC_MSI_IRQ_DOMAIN
-  quasi_print((uint32_t)&dev_local->msi_domain,INIT_TOKEN+84);
+  quasi_print((uint32_t)&dev_local->msi.domain,INIT_TOKEN+84);
   #endif
   #ifdef PINCTRL
   quasi_print((uint32_t)&dev_local->pins,TOKEN_RANGE1+6);
   #endif
   #ifdef CONFIG_GENERIC_MSI_IRQ
-  quasi_print((uint32_t)&dev_local->msi_list,INIT_TOKEN+85);
+  quasi_print((uint32_t)&dev_local->msi.data,INIT_TOKEN+85);
   #endif
   #ifdef CONFIG_NUMA
   quasi_print((uint32_t)&dev_local->numa_node,INIT_TOKEN+86);
   #endif
   quasi_print((uint32_t)&dev_local->dma_mask,INIT_TOKEN+87);
   quasi_print((uint32_t)&dev_local->coherent_dma_mask,INIT_TOKEN+88);
-  quasi_print((uint32_t)&dev_local->dma_pfn_offset,INIT_TOKEN+89);
+  quasi_print((uint32_t)&dev_local->dma_range_map.offset,INIT_TOKEN+89);
   quasi_print((uint32_t)&dev_local->dma_parms,INIT_TOKEN+90);
   quasi_print((uint32_t)&dev_local->dma_pools,INIT_TOKEN+91);
   quasi_print((uint32_t)&dev_local->dma_mem,INIT_TOKEN+92);
@@ -282,17 +283,17 @@ void *dev_check(struct device *dev)
   #endif
   quasi_print((uint32_t)&dev_local->archdata,INIT_TOKEN+94);
   // { Members of  'struct dev_archdata	archdata'
-      quasi_print((uint32_t)&dev_local->archdata.dma_ops,INIT_TOKEN+95);
+      quasi_print((uint32_t)&dev_local->dma_ops,INIT_TOKEN+95);
       #ifdef CONFIG_DMABOUNCE
       quasi_print((uint32_t)&dev_local->archdata.dmabounce,INIT_TOKEN+96);
       #endif
       #ifdef CONFIG_IOMMU_API
-      quasi_print((uint32_t)&dev_local->archdata.iommu,INIT_TOKEN+97);
+      quasi_print((uint32_t)&dev_local->iommu,INIT_TOKEN+97);
       #endif
       #ifdef CONFIG_ARM_DMA_USE_IOMMU
       quasi_print((uint32_t)&dev_local->archdata.mapping,INIT_TOKEN+98);
       #endif
-      quasi_print((uint32_t)&dev_local->archdata.dma_coherent,INIT_TOKEN+99);
+      quasi_print((uint32_t)&dev_local->dma_coherent,INIT_TOKEN+99);
   // } Back to 'struct device'
 
 
@@ -309,7 +310,7 @@ void *dev_check(struct device *dev)
 
 void *file_check(struct file *filep){
   struct file *filep_local = 0;
-  quasi_print((uint32_t)&filep_local->f_u,INIT_TOKEN+0);
+//   quasi_print((uint32_t)&filep_local->f_u,INIT_TOKEN+0); // Identifier removed, somewhere along the way
   quasi_print((uint32_t)&filep_local->f_path,INIT_TOKEN+1);
   quasi_print((uint32_t)&filep_local->f_inode,INIT_TOKEN+2);
   quasi_print((uint32_t)&filep_local->f_op,INIT_TOKEN+3);
@@ -359,29 +360,29 @@ void *file_check(struct file *filep){
   quasi_print((uint32_t)&filep_local->f_mode,INIT_TOKEN+26);
   quasi_print((uint32_t)&filep_local->f_pos_lock,INIT_TOKEN+27);
   // { Members of  'struct mutex f_pos_lock'
-      quasi_print((uint32_t)&filep_local->f_pos_lock.count,INIT_TOKEN+28);
+      quasi_print((uint32_t)&filep_local->f_pos_lock.owner,INIT_TOKEN+28);
       quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock,INIT_TOKEN+29);
       // { Members of 'struct spintlock_t wait_lock'
-          quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.rlock,INIT_TOKEN+30);
+          quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock,INIT_TOKEN+30);
           // { Members of 'struct raw_spinlock rlock'
-              quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.rlock.raw_lock,INIT_TOKEN+31);
+              quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.raw_lock,INIT_TOKEN+31);
               #ifdef CONFIG_GENERIC_LOCKBREAK
-              quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.rlock.break_lock,INIT_TOKEN+32);
+              quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.break_lock,INIT_TOKEN+32);
 	      #endif
               #ifdef CONFIG_DEBUG_SPINLOCK
-              quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.rlock.magic,INIT_TOKEN+33);
-              quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.rlock.owner_cpu,INIT_TOKEN+34);
-              quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.rlock.owner,INIT_TOKEN+35);
+              quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.magic,INIT_TOKEN+33);
+              quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.owner_cpu,INIT_TOKEN+34);
+              quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.owner,INIT_TOKEN+35);
 	      #endif
               #ifdef CONFIG_DEBUG_LOCK_ALLOC
-              quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.rlock.dep_map,INIT_TOKEN+36);
+              quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.dep_map,INIT_TOKEN+36);
 	      // { Members of 'struct lockdep_map dep_map'
-                  quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.rlock.dep_map.key,INIT_TOKEN+37);
-                  quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.rlock.dep_map.class_cache,INIT_TOKEN+38);
-                  quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.rlock.dep_map.name,INIT_TOKEN+39);
+                  quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.dep_map.key,INIT_TOKEN+37);
+                  quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.dep_map.class_cache,INIT_TOKEN+38);
+                  quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.dep_map.name,INIT_TOKEN+39);
                   #ifdef CONFIG_LOCK_STAT
-                  quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.rlock.dep_map.cpu,INIT_TOKEN+40);
-                  quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.rlock.dep_map.ip,INIT_TOKEN+41);
+                  quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.dep_map.cpu,INIT_TOKEN+40);
+                  quasi_print((uint32_t)&filep_local->f_pos_lock.wait_lock.dep_map.ip,INIT_TOKEN+41);
 	          #endif
 	      // } Back to 'struct raw_spinlock rlock'
 	      #endif
@@ -472,8 +473,8 @@ void *file_check(struct file *filep){
   #endif
   quasi_print((uint32_t)&filep_local->private_data,INIT_TOKEN+87);
   #ifdef CONFIG_EPOLL
-  quasi_print((uint32_t)&filep_local->f_ep_links,INIT_TOKEN+88);
-  quasi_print((uint32_t)&filep_local->f_tfile_llink,INIT_TOKEN+89);
+  quasi_print((uint32_t)&filep_local->f_ep,INIT_TOKEN+88);
+//   quasi_print((uint32_t)&filep_local->f_tfile_llink,INIT_TOKEN+89);
   #endif
   quasi_print((uint32_t)&filep_local->f_mapping,INIT_TOKEN+90);
   return NULL;
