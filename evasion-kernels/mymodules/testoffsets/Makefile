@@ -10,8 +10,8 @@ KBUILD_CFLAGS += -w
 obj-m+=testoffsets.o
 
 all:
-	make -C ../../ M=$(PWD) ARCH=arm CROSS_COMPILE=arm-linux-androideabi- modules
-	arm-linux-androideabi-objcopy --dump-section .text=text.bin testoffsets.ko
+	make -C ../../ M=$(PWD) ARCH=arm64 CROSS_COMPILE=aarch64-linux-android- modules
+	aarch64-linux-android-objcopy --dump-section .text=text.bin testoffsets.ko
 
 clean:
 	rm -f *.ko *.o
