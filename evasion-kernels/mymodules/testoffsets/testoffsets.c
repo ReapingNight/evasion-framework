@@ -1,17 +1,17 @@
-#include <linux/init.h>          
-#include <linux/module.h>        
-#include <linux/device.h>        
-#include <linux/kernel.h>        
-#include <linux/fs.h>            
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/device.h>
+#include <linux/kernel.h>
+#include <linux/fs.h>
 #include <linux/slab.h>
 #include <linux/vmalloc.h>
 #include <linux/platform_device.h>
-#include <asm/uaccess.h>         
+#include <asm/uaccess.h>
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("ivanp");
+MODULE_AUTHOR("ivanp,jcbotha");
 MODULE_DESCRIPTION("***");
-MODULE_VERSION("0.2");
+MODULE_VERSION("0.3");
 
 void *pdev_check(struct platform_device *pdev, struct device **dev) 
 {
@@ -28,7 +28,7 @@ void *pdev_check(struct platform_device *pdev, struct device **dev)
 #define TOKEN_RLOCK2 1000
 #define TOKEN_RLOCK3 1500
 #define TOKEN_RANGE1 2000
-uint32_t noinline quasi_print(uint32_t offset, int token);
+uint32_t noinline quasi_print(uint32_t offset, int token) {asm(""); return 1;}
 //{
 //  asm ("");
 //  return 1;
@@ -138,7 +138,7 @@ void *dev_check(struct device *dev)
           // { Members of 'struct raw_spinlock rlock'
               quasi_print((uint32_t)&dev_local->power.lock.rlock.raw_lock,TOKEN_RLOCK2+1);
               #ifdef CONFIG_GENERIC_LOCKBREAK
-              quasi_print((uint32_t)&dev_local->power.lock.rlock.break_lock,TOKEN_RLOCK2+2);
+//              quasi_print((uint32_t)&dev_local->power.lock.break_lock,TOKEN_RLOCK2+2);
 	      #endif
               #ifdef CONFIG_DEBUG_SPINLOCK
               quasi_print((uint32_t)&dev_local->power.lock.rlock.magic,TOKEN_RLOCK2+3);
@@ -146,7 +146,7 @@ void *dev_check(struct device *dev)
               quasi_print((uint32_t)&dev_local->power.lock.rlock.owner,TOKEN_RLOCK2+5);
 	      #endif
               #ifdef CONFIG_DEBUG_LOCK_ALLOC
-              quasi_print((uint32_t)&dev_local->power.lock.rlock.dep_map,TOKEN_RLOCK2+6);
+              quasi_print((uint32_t)&dev_local->power.lock.dep_map,TOKEN_RLOCK2+6);
 	      // { Members of 'struct lockdep_map dep_map'
                   quasi_print((uint32_t)&dev_local->power.lock.rlock.dep_map.key,TOKEN_RLOCK2+7);
                   quasi_print((uint32_t)&dev_local->power.lock.rlock.dep_map.class_cache,TOKEN_RLOCK2+8);
@@ -184,26 +184,26 @@ void *dev_check(struct device *dev)
           // { Members of 'wait_queue_head_t wait'
               quasi_print((uint32_t)&dev_local->power.completion.wait.lock,INIT_TOKEN+56);
               // { Members of 'spintlock_t lock'
-                  quasi_print((uint32_t)&dev_local->power.completion.wait.lock.rlock,INIT_TOKEN+57);
+                  quasi_print((uint32_t)&dev_local->power.completion.wait.lock,INIT_TOKEN+57);
                   // { Members of 'struct raw_spinlock rlock'
-                      quasi_print((uint32_t)&dev_local->power.completion.wait.lock.rlock.raw_lock,TOKEN_RLOCK3+1);
+                      quasi_print((uint32_t)&dev_local->power.completion.wait.lock.raw_lock,TOKEN_RLOCK3+1);
                       #ifdef CONFIG_GENERIC_LOCKBREAK
-                      quasi_print((uint32_t)&dev_local->power.completion.wait.lock.rlock.break_lock,TOKEN_RLOCK3+2);
+//                      quasi_print((uint32_t)&dev_local->power.completion.wait.lock.rlock.break_lock,TOKEN_RLOCK3+2);
 	              #endif
                       #ifdef CONFIG_DEBUG_SPINLOCK
-                      quasi_print((uint32_t)&dev_local->power.completion.wait.lock.rlock.magic,TOKEN_RLOCK3+3);
-                      quasi_print((uint32_t)&dev_local->power.completion.wait.lock.rlock.owner_cpu,TOKEN_RLOCK3+4);
-                      quasi_print((uint32_t)&dev_local->power.completion.wait.lock.rlock.owner,TOKEN_RLOCK3+5);
+                      quasi_print((uint32_t)&dev_local->power.completion.wait.lock.magic,TOKEN_RLOCK3+3);
+                      quasi_print((uint32_t)&dev_local->power.completion.wait.lock.owner_cpu,TOKEN_RLOCK3+4);
+                      quasi_print((uint32_t)&dev_local->power.completion.wait.lock.owner,TOKEN_RLOCK3+5);
 	              #endif
                       #ifdef CONFIG_DEBUG_LOCK_ALLOC
                       quasi_print((uint32_t)&dev_local->power.lock.rlock.dep_map,TOKEN_RLOCK3+6);
 	              // { Members of 'struct lockdep_map dep_map'
-                          quasi_print((uint32_t)&dev_local->power.completion.wait.lock.rlock.dep_map.key,TOKEN_RLOCK3+7);
-                          quasi_print((uint32_t)&dev_local->power.completion.wait.lock.rlock.dep_map.class_cache,TOKEN_RLOCK3+8);
-                          quasi_print((uint32_t)&dev_local->power.completion.wait.lock.rlock.dep_map.name,TOKEN_RLOCK3+9);
+                          quasi_print((uint32_t)&dev_local->power.completion.wait.lock.dep_map.key,TOKEN_RLOCK3+7);
+                          quasi_print((uint32_t)&dev_local->power.completion.wait.lock.dep_map.class_cache,TOKEN_RLOCK3+8);
+                          quasi_print((uint32_t)&dev_local->power.completion.wait.lock.dep_map.name,TOKEN_RLOCK3+9);
                           #ifdef CONFIG_LOCK_STAT
-                          quasi_print((uint32_t)&dev_local->power.completion.wait.lock.rlock.dep_map.cpu,TOKEN_RLOCK3+10);
-                          quasi_print((uint32_t)&dev_local->power.completion.wait.lock.rlock.dep_map.ip,TOKEN_RLOCK3+11);
+                          quasi_print((uint32_t)&dev_local->power.completion.wait.lock.dep_map.cpu,TOKEN_RLOCK3+10);
+                          quasi_print((uint32_t)&dev_local->power.completion.wait.lock.dep_map.ip,TOKEN_RLOCK3+11);
 	                  #endif
 	              // } Back to 'struct raw_spinlock rlock'
 	              #endif
@@ -274,7 +274,7 @@ void *dev_check(struct device *dev)
   #endif
   quasi_print((uint32_t)&dev_local->dma_mask,INIT_TOKEN+87);
   quasi_print((uint32_t)&dev_local->coherent_dma_mask,INIT_TOKEN+88);
-  quasi_print((uint32_t)&dev_local->dma_range_map.offset,INIT_TOKEN+89);
+  quasi_print((uint32_t)&dev_local->dma_range_map,INIT_TOKEN+89); // TODO: Check offset in *dma_range_map
   quasi_print((uint32_t)&dev_local->dma_parms,INIT_TOKEN+90);
   quasi_print((uint32_t)&dev_local->dma_pools,INIT_TOKEN+91);
   quasi_print((uint32_t)&dev_local->dma_mem,INIT_TOKEN+92);
@@ -293,7 +293,7 @@ void *dev_check(struct device *dev)
       #ifdef CONFIG_ARM_DMA_USE_IOMMU
       quasi_print((uint32_t)&dev_local->archdata.mapping,INIT_TOKEN+98);
       #endif
-      quasi_print((uint32_t)&dev_local->dma_coherent,INIT_TOKEN+99);
+      quasi_print((uint32_t)dev_local->dma_coherent,INIT_TOKEN+99);
   // } Back to 'struct device'
 
 
