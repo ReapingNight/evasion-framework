@@ -1,9 +1,9 @@
 #! /usr/bin/python
 
 from unicorn import *
-from unicorn.arm_const import *
-import os
+from unicorn.arm64_const import *
 from capstone import *
+import os
 import sys
 import argparse
 
@@ -13,15 +13,15 @@ except:
     print('elftools needed! try: pip install pyelftools')
     sys.exit(1)
 
-OFFSETS1_PATH = "./offsets1.txt"  # Xiaomi config
-OFFSETS2_PATH = "./offsets2.txt"  # Alien config
+OFFSETS1_PATH = "./offsets1.txt"  # Android config
+OFFSETS2_PATH = "./offsets2.txt"  # Linux config
 token2config_struct_file = {86: "CONFIG_SECURITY"}
 
 PAGE_SIZE = 0x1000
 PAGE_MASK = 0xfffffffffffff000
 CODE_START = 0
-STACK_TOP = 0x10000000+8192
-STACK_SIZE = 1024
+STACK_TOP = 0x10000000+0x2000
+STACK_SIZE = 0x1000
 
 
 def PAGE_ALIGNED(sz):
@@ -45,6 +45,7 @@ def disas_all(self, data, addr):
     for i in self.disasm(data, addr):
         print("  0x%x:\t%s\t%s" % (i.address, i.mnemonic, i.op_str))
 
+
 # Filter out lines that start with '>'
 
 def filter_comments(line):
@@ -59,7 +60,7 @@ def read_offsets(filename):
         offsets = f.readlines()
     # remove trailing '\n'
     offsets = [x.strip() for x in offsets]
-    offsets = filter(filter_comments, offsets)
+    offsets = list(filter(filter_comments, offsets))
     return offsets
 
 
@@ -92,7 +93,7 @@ def compare_tokens(offsets1, offsets2):
     for token in missing_tokens:
         #if(token2config_struct_file.has_key(token)):
         if token in token2config_struct_file:
-            print("{} -> {}".format(token, token2config_struct_file[token]))
+            print(("{} -> {}".format(token, token2config_struct_file[token])))
     # should be removed from vanilla kernel (i.e. they add more offset then necessary)
     excess_tokens = tokens2-tokens1
     print(("You should remove the following tokens from the alien kernel config: {}".format(
@@ -100,7 +101,7 @@ def compare_tokens(offsets1, offsets2):
     print("Here is the list of known config options:")
     for token in excess_tokens:
         if token in token2config_struct_file:
-            print("{} -> {}".format(token, token2config_struct_file[token]))
+            print(("{} -> {}".format(token, token2config_struct_file[token])))
 
     if len(missing_tokens) != 0 or len(excess_tokens) != 0:
         return 1
@@ -122,8 +123,8 @@ def compare_pairwise_differences(offsets1, offsets2):
         diff2 = off2_next - off2_cur
 
         if diff1 != diff2:
-            print("There is a mismatch between tokens {} and {}",
-                  offsets1[i][0], offsets1[i+1][0])
+            print(("There is a mismatch between tokens {} and {}",
+                  offsets1[i][0], offsets1[i+1][0]))
             return 1
 
     return 0
@@ -154,7 +155,6 @@ def compare_offsets(offsets1, offsets2):
 def find_symbol(elffile, symname):
     t_section = None
     t_vaddr = None
-    #elf = ELFFile(open("testoffsets.ko", 'rb'))
     elf = ELFFile(open(elffile, 'rb'))
     # find the symbols table(s)
     for section in elf.iter_sections():
@@ -168,7 +168,7 @@ def find_symbol(elffile, symname):
                     t_section = symbol.entry['st_shndx']
                     symbol_section = elf.get_section(t_section)
                     file_offset = symbol_section.header['sh_offset']
-                    # print("Found symbol '{}'; t_vaddr={} with t_size={}; sh_offset={}".format(symname, hex(t_vaddr), t_size, file_offset))
+                    #print("Found symbol '{}'; t_vaddr={} with t_size={}; sh_offset={}".format(symname, hex(t_vaddr), t_size, file_offset))
                     return t_vaddr + file_offset, t_size
     return None
 
@@ -188,37 +188,37 @@ def hook_code(uc, address, size, offsets):
     inst = uc.mem_read(address, size)
 
     # rasm2 -a arm -b32 'bl 0' --> feffffeb
-    if(inst[0] == 0xfe and inst[1] == 0xff and inst[2] == 0xff and inst[3] == 0xeb):
-        r_pc = uc.reg_read(UC_ARM_REG_PC)
+    if inst[0] == 0xfe and inst[1] == 0xff and inst[2] == 0xff and inst[3] == 0xeb:
+        r_pc = uc.reg_read(UC_ARM64_REG_PC)
         r_pc += 4
-        uc.reg_write(UC_ARM_REG_PC, r_pc)
-        r0 = uc.reg_read(UC_ARM_REG_R0)  # offset
-        r1 = uc.reg_read(UC_ARM_REG_R1)  # token
+        uc.reg_write(UC_ARM64_REG_PC, r_pc)
+        r0 = uc.reg_read(UC_ARM64_REG_X0)  # offset
+        r1 = uc.reg_read(UC_ARM64_REG_X1)  # token
         offsets.append((r1, r0))
 
 
 def emulate(elffile, func_start, func_end):
     offsets = list()
     try:
-        mu = Uc(UC_ARCH_ARM, UC_MODE_ARM)
+        mu = Uc(UC_ARCH_ARM64, UC_MODE_ARM)
         code_size = os.stat(elffile).st_size
         code = read_file(elffile)
 
         # Memory for code starting at 0
-        print("Mapping memory to 0x%x size 0x%x" % (PAGE_START(CODE_START), PAGE_ALIGNED(code_size)))
+        # print("Mapping memory to 0x%x size 0x%x" % (PAGE_START(CODE_START), PAGE_ALIGNED(code_size)))
         mu.mem_map(PAGE_START(CODE_START), PAGE_ALIGNED(code_size))
         #print("writing code")
         mu.mem_write(PAGE_START(CODE_START), code)
         #print("wrote code")
 
         # Memory for stack
-        print("Mapping memory to 0x%x size 0x%x" % (PAGE_START(STACK_TOP), PAGE_ALIGNED(STACK_SIZE)))
+        # print("Mapping memory to 0x%x size 0x%x" % (PAGE_START(STACK_TOP), PAGE_ALIGNED(STACK_SIZE)))
         mu.mem_map(PAGE_START(STACK_TOP), PAGE_ALIGNED(STACK_SIZE))
         # print("Mapped")
 
         # Set stack pointer
         stack_bottom = STACK_TOP+STACK_SIZE
-        mu.reg_write(UC_ARM_REG_R13, stack_bottom)
+        mu.reg_write(UC_ARM64_REG_SP, stack_bottom)
 
         # tracing one instruction at ADDRESS with customized callback
         mu.hook_add(UC_HOOK_CODE, hook_code, begin=func_start,
@@ -227,11 +227,11 @@ def emulate(elffile, func_start, func_end):
         # print("starting!")
         mu.emu_start(func_start, func_end)
 
-        r_pc = mu.reg_read(UC_ARM_REG_PC)
+        r_pc = mu.reg_read(UC_ARM64_REG_PC)
         #print(">>> PC = 0x%x" % (r_pc-0x34))
 
     except UcError as e:
-        print("ERROR: %s" % e)
+        print(("ERROR: %s" % e))
         exit(-1)
     return offsets
 
@@ -253,8 +253,8 @@ def main(argv):
     parser = argparse.ArgumentParser(description='Find config differences.')
     parser.add_argument('-v', '--vanilla', metavar='MODULE',
                         help='Module compiled against vanilla kernel', required=True)
-    parser.add_argument('-x', '--xiaomi', metavar='MODULE',
-                        help='Module compiled against xiaomi kernel',  required=True)
+    parser.add_argument('-a', '--android', metavar='MODULE',
+                        help='Module compiled against android kernel',  required=True)
     parser.add_argument('--dev', action='store_true',
                         help='Check file_check',  default=False)
     parser.add_argument('--file', action='store_true',
@@ -274,25 +274,24 @@ def main(argv):
 
     if args.file:
         func_name = "file_check"
-    else:
+    else: # args.dev
         func_name = "dev_check"
 
     if not os.path.exists(args.vanilla):
-        print("error: could not find file '{}'".format(args.vanilla))
+        print(("error: could not find file '{}'".format(args.vanilla)))
         exit(0)
 
-    if not os.path.exists(args.xiaomi):
-        print("error: could not find file '{}'".format(args.xiaomi))
+    if not os.path.exists(args.android):
+        print(("error: could not find file '{}'".format(args.android)))
         exit(0)
 
-    (func_offset, size) = find_symbol(args.xiaomi, func_name)
-    print("[+] Emulating file_check @ {}".format(hex(func_offset)))
-    offsets1 = emulate(args.xiaomi, func_offset, func_offset+size-4)
+    (func_offset, size) = find_symbol(args.android, func_name)
+    print(("[+] Emulating file_check @ {}".format(hex(func_offset))))
+    offsets1 = emulate(args.android, func_offset, func_offset+size-4)
 
     (func_offset, size) = find_symbol(args.vanilla, func_name)
-    print("[+] Emulating file_check @ {}".format(hex(func_offset)))
+    print(("[+] Emulating file_check @ {}".format(hex(func_offset))))
     offsets2 = emulate(args.vanilla, func_offset, func_offset+size-4)
-    # print(offsets2)
 
     print("[+] Comparing offsets")
     ret = compare_offsets(offsets1, offsets2)
