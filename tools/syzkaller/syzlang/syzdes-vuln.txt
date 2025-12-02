@@ -1,0 +1,39 @@
+include <linux/fcntl.h>
+include <linux/wrapper.h>
+
+resource fd_vuln_ioctl[fd]
+openat$venus_wrapper(fd const[AT_FDCWD], file ptr[in, string["/dev/ioctl_wrapper"]], flags const[0x2], mode const[0x0]) fd_vuln_ioctl
+ioctl$IOCTL_WRAPPER_CMD(fd fd_vuln_ioctl, cmd const[IOCTL_CMD_WRAPPER], arg ptr[in, args_data])
+
+args_data {
+	reqs	hfi_buffer_requirements
+	info	hfi_msg_session_property_info_pkt
+}
+
+hfi_buffer_requirements {
+	type		int32
+	size		int32
+	region_size	int32
+	hold_count	int32
+	count_min	int32
+	count_actual	int32
+	contiguous	int32
+	alignment	int32
+}
+
+hfi_msg_session_property_info_pkt {
+	shdr		hfi_session_hdr_pkt
+	num_properties	int32
+	property	int32
+	data		array[int8, 300]
+}
+
+hfi_session_hdr_pkt {
+	hdr		hfi_pkt_hdr
+	session_od	int32
+}
+
+hfi_pkt_hdr {
+	size		int32
+	pkt_type	int32
+}
