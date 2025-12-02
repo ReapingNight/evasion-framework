@@ -5,8 +5,6 @@ KBUILD_CFLAGS += -w
 #KBUILD_CFLAGS += -Wno-error=unused-but-set-variable
 #KBUILD_CFLAGS += -Wno-error=unused-variable
 
-# -----> export PATH="$PATH:$(realpath ../../../../compilers/arm-linux-androideabi-4.9/bin)"
-
 obj-m+=testoffsets.o
 
 all:
